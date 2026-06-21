@@ -1,55 +1,55 @@
-# Libre Asist - Extension para LibreOffice
+# Libre Asist - LibreOffice Extension
 
-Asistente de IA para LibreOffice Calc y Writer. Escribe en lenguaje natural y el asistente propone cambios para tu documento.
+AI assistant for LibreOffice Calc and Writer. Write in natural language and the assistant proposes changes to your document.
 
-## Características
+## Features
 
-- **Calc**: Fórmulas, tablas dinámicas, formatos, análisis de datos, duplicados, conciliación bancaria
-- **Writer**: Reescribir, formatear, listas, tablas, hipervínculos, notas al pie, exportar
+- **Calc**: Formulas, pivot tables, formatting, data analysis, duplicates, bank reconciliation
+- **Writer**: Rewrite, format, lists, tables, hyperlinks, footnotes, export
 
-## Instalación
+## Installation
 
-### Opción 1: Archivo .oxt (Recomendado)
+### Option 1: .oxt file (Recommended)
 
-1. Descarga `libre_asist.oxt`
-2. Abre LibreOffice (Calc o Writer)
-3. Ve a **Herramientas > Extensiones > Gestor de extensiones**
-4. Haz clic en **Agregar**
-5. Selecciona el archivo `libre_asist.oxt`
-6. Reinicia LibreOffice
-7. Ve a **Herramientas > Macros > Ejecutar macro** y ejecuta `LibreAsist.show_panel`
+1. Download `libre_asist.oxt`
+2. Open LibreOffice (Calc or Writer)
+3. Go to **Tools > Extensions > Extension Manager**
+4. Click **Add**
+5. Select the `libre_asist.oxt` file
+6. Restart LibreOffice
+7. Go to **Tools > Macros > Run Macro** and execute `LibreAsist.show_panel`
 
-### Opción 2: Instalación manual
+### Option 2: Manual Installation
 
-1. Copia la carpeta `libre_asist` a:
+1. Copy the `libre_asist` folder to:
    - Linux: `~/.config/libreoffice/4/user/Scripts/python/`
    - Windows: `%APPDATA%\LibreOffice\4\user\Scripts\python\`
    - macOS: `~/Library/Application Support/LibreOffice/4/user/Scripts/python/`
 
-2. Configura una macro para ejecutar `libre_asist.show_panel`
+2. Configure a macro to run `libre_asist.show_panel`
 
-## Configuración
+## Configuration
 
-1. Abre el panel de Libre Asist
-2. Haz clic en el botón **Config**
-3. Ingresa la URL de tu API de IA (OpenAI, Ollama, Anthropic, etc.)
-4. Ingresa la clave API si es necesario
-5. Haz clic en **Guardar**
+1. Open the Libre Asist panel
+2. Click the **Config** button
+3. Enter your AI API URL (OpenAI, Ollama, Anthropic, etc.)
+4. Enter the API key if required
+5. Click **Save**
 
-## Uso
+## Usage
 
-1. Abre un documento de Calc o Writer
-2. Selecciona celdas o texto (opcional en Calc)
-3. Escribe tu solicitud en lenguaje natural
-4. El asistente propondrá cambios
-5. Confirma con "si" o "confirmar"
+1. Open a Calc or Writer document
+2. Select cells or text (optional in Calc)
+3. Write your request in natural language
+4. The assistant will propose changes
+5. Confirm with "yes" or "confirm"
 
-## Idiomas
+## Languages
 
-- Español (predeterminado)
-- Inglés
-- Chino
+- Spanish (default)
+- English
+- Chinese
 
-## Licencia
+## License
 
 Mozilla Public License 2.0
