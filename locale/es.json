@@ -16,6 +16,7 @@
   "lbl.url": "API URL:",
   "lbl.model": "Model:",
   "lbl.key": "API Key:",
+  "lbl.timeout": "Timeout (segundos):",
   "lbl.sys_preset": "System preset:",
   "lbl.sys_prompt": "System prompt:",
   "chk.web_search": "Habilitar busqueda web (tool web_search)",

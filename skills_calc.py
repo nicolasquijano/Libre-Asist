@@ -79,6 +79,9 @@ def calc_random_fill(user_prompt, ctx):
             "\n- If the request does not specify how many records, generate at least 10 rows or fill the allowed cells, whichever is less."
             "\n- If the request does not make sense (no cells, no columns detected), return a JSON with a summary explaining the limitation and empty changes []."
             "\n- Do not change cells outside allowed_cells or generated_allowed_cells."
+            "\n\nCRITICAL COMPLETENESS RULE: When the user explicitly requests a specific number of rows, "
+            "generate EXACTLY that many rows. Do NOT stop after a few rows. Emit every change entry for every cell "
+            "of every row. Completeness > brevity."
         ),
         "Briefly explain what type of data you generated and return a single JSON in ```json with many changes (one per cell to fill):\n" + CALC_ACTION_SCHEMA,
         'Request: "fill with random data"\n'
@@ -330,6 +333,17 @@ def calc_preview(user_prompt, ctx):
         "Apply a filter to the selected data range.\n\nRequest: " + user_prompt,
         ctx,
         COMMON_RULES + "\n- This applies an autofilter to a range.\n- Use the range from context (e.g., '" + (ctx.get("range") or "A1:E20") + "') as the range.\n- filter_type: autofilter adds dropdown buttons to column headers.\n- criteria: advanced filter with specific conditions (future).\n- show_filter_buttons: whether to show filter dropdowns.\n- Do NOT return regular cell changes.",
+        "Return a single JSON in ```json with this contract:\n" + CALC_FILTER_SCHEMA,
+        'Request: "Apply filter to this data"\n```json\n{"action":"apply_filter","summary":"Applies autofilter","range":"A1:E20","filter_type":"autofilter","show_filter_buttons":true}\n```',
+    )
+
+
+def calc_apply_filter(user_prompt, ctx):
+    return _block(
+        "You are a data filtering expert for LibreOffice Calc.",
+        "Apply a filter to the selected data range.\n\nRequest: " + user_prompt,
+        ctx,
+        COMMON_RULES + "\n- This applies an autofilter to a range.\n- Use the range from context (e.g., A1:E20) as the range.\n- filter_type: autofilter adds dropdown buttons to column headers.\n- criteria: advanced filter with specific conditions.\n- Do NOT return regular cell changes.",
         "Return a single JSON in ```json with this contract:\n" + CALC_FILTER_SCHEMA,
         'Request: "Apply filter to this data"\n```json\n{"action":"apply_filter","summary":"Applies autofilter","range":"A1:E20","filter_type":"autofilter","show_filter_buttons":true}\n```',
     )

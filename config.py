@@ -12,7 +12,7 @@ CONFIG_PATH = os.path.join(CONFIG_DIR, "config.json")
 
 PROVIDER_PRESETS = {
     "MiniMax": {
-        "api_url": "https://api.minimax.chat/v1/chat/completions",
+        "api_url": "https://api.minimax.io/v1/chat/completions",
         "model": "MiniMax-M3",
     },
     "OpenAI": {
@@ -59,8 +59,8 @@ DEFAULT_CONFIG = {
     "system_prompt": "You are a helpful assistant.",
     "system_preset": "General",
     "temperature": 0.7,
-    "max_tokens": 2048,
-    "timeout": 60,
+    "max_tokens": 8192,
+    "timeout": 180,
     "enable_web_search": False,
     "search_max_results": 5,
 }

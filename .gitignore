@@ -1,6 +1,39 @@
+# Python
 __pycache__/
 *.pyc
 *.pyo
 *.egg-info/
 .env
 .venv
+venv/
+env/
+
+# Extension
+*.oxt
+
+# Test outputs and temp files
+TEST_OUTPUT/
+*.tmp
+*.bak
+*.swp
+.DS_Store
+
+# Build artifacts
+dist/
+build/
+*.egg
+
+# Sensitive data (API keys, tokens, passwords)
+# Configuration files are stored outside the project at:
+# ~/.config/libreoffice/4/user/libre_asist/
+*.key
+*.pem
+secrets.json
+credentials.json
+config.local.json
+
+# Editor and OS
+.idea/
+.vscode/
+*.swp
+*~

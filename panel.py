@@ -1,4 +1,4 @@
-# CACHE_BUSTER: 1781326001
+# CACHE_BUSTER: 1781326002
 """Floating Calc assistant styled as a ChatGPT-like spreadsheet sidebar."""
 
 import os
@@ -148,7 +148,7 @@ def _build_panel_dialog():
 
 def _build_config_dialog():
     model = _smgr().createInstanceWithContext("com.sun.star.awt.UnoControlDialogModel", _ctx())
-    _set(model, Title=_("panel.title.config"), Closeable=True, Moveable=True, Sizeable=True, Width=720, Height=900)
+    _set(model, Title=_("panel.title.config"), Closeable=True, Moveable=True, Sizeable=True, Width=720, Height=980)
 
     _add_label(model, "lblProvider", _("lbl.provider"))
     _add_text(model, "txtProvider")
@@ -162,13 +162,15 @@ def _build_config_dialog():
     _add_text(model, "txtSystemPreset")
     _add_label(model, "lblSys", _("lbl.sys_prompt"))
     _add_text(model, "txtSystem", multi=True)
+    _add_label(model, "lblTimeout", _("lbl.timeout"))
+    _add_text(model, "txtTimeout")
     _add_checkbox(model, "chkWebSearch", _("chk.web_search"), checked=False)
     _add_button(model, "btnSave", _("btn.save"), default=True)
     _add_button(model, "btnCancel", _("btn.cancel"))
 
     dialog = _smgr().createInstanceWithContext("com.sun.star.awt.UnoControlDialog", _ctx())
     dialog.setModel(model)
-    dialog.setPosSize(0, 0, 720, 900, POS_SIZE)
+    dialog.setPosSize(0, 0, 720, 980, POS_SIZE)
     dialog.createPeer(_toolkit(), None)
     return dialog
 
@@ -1412,9 +1414,10 @@ class PanelController:
             ("lblKey", 20, 320, 680, 30), ("txtKey", 20, 358, 680, 44),
             ("lblSysPreset", 20, 420, 680, 30), ("txtSystemPreset", 20, 458, 680, 44),
             ("lblSys", 20, 520, 680, 30), ("txtSystem", 20, 558, 680, 86),
-            ("chkWebSearch", 20, 660, 680, 36),
-            ("btnSave", 20, 780, 320, 44),
-            ("btnCancel", 380, 780, 320, 44),
+            ("lblTimeout", 20, 660, 680, 30), ("txtTimeout", 20, 698, 680, 44),
+            ("chkWebSearch", 20, 758, 680, 36),
+            ("btnSave", 20, 860, 320, 44),
+            ("btnCancel", 380, 860, 320, 44),
         ]
         for name, x, y, w, h in items:
             dlg.getControl(name).setPosSize(x, y, w, h, POS_SIZE)
@@ -1427,6 +1430,7 @@ class PanelController:
         dlg.getControl("txtKey").setText(cfg.get("api_key", ""))
         dlg.getControl("txtSystemPreset").setText(cfg.get("system_preset", "General"))
         dlg.getControl("txtSystem").setText(cfg.get("system_prompt", ""))
+        dlg.getControl("txtTimeout").setText(str(cfg.get("timeout", 180)))
         chk = dlg.getControl("chkWebSearch")
         chk.setState(1 if cfg.get("enable_web_search", False) else 0)
 
@@ -1437,6 +1441,10 @@ class PanelController:
         new_cfg["api_key"] = dlg.getControl("txtKey").getText()
         new_cfg["system_preset"] = dlg.getControl("txtSystemPreset").getText() or "General"
         new_cfg["system_prompt"] = dlg.getControl("txtSystem").getText()
+        try:
+            new_cfg["timeout"] = max(10, int(dlg.getControl("txtTimeout").getText() or "180"))
+        except (TypeError, ValueError):
+            new_cfg["timeout"] = 180
         new_cfg["enable_web_search"] = bool(dlg.getControl("chkWebSearch").getState())
         config.save(new_cfg)
         self.cfg = new_cfg

@@ -30,6 +30,7 @@
     "lbl.url": "URL API",
     "lbl.model": "Модель",
     "lbl.key": "Ключ API",
+    "lbl.timeout": "Тайм-аут (секунды):",
     "lbl.sys_preset": "Системный пресет",
     "lbl.sys_prompt": "Системный промпт",
     "chk.web_search": "Включить веб-поиск",

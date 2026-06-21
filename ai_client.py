@@ -71,9 +71,21 @@ class AIClient:
         self.system_preset = cfg.get("system_preset", "General")
         self.temperature = float(cfg.get("temperature", 0.7))
         self.max_tokens = int(cfg.get("max_tokens", 2048))
-        self.timeout = int(cfg.get("timeout", 60))
+        self.timeout = int(cfg.get("timeout", 180))
         self.enable_web_search = bool(cfg.get("enable_web_search", False))
         self.search_max_results = int(cfg.get("search_max_results", 5))
+
+    def _language_instruction(self):
+        """Get a strong language matching instruction."""
+        return (
+            "CRITICAL LANGUAGE RULE: You MUST respond in the EXACT same language "
+            "as the user's request. If the user writes in Spanish, respond in Spanish. "
+            "If the user writes in English, respond in English. "
+            "If the user writes in Chinese, respond in Chinese. "
+            "Match the language of the user's input throughout your entire response, "
+            "including any explanations, summaries, JSON values, and field content like "
+            "'summary', 'title', etc. This is the highest priority instruction."
+        )
 
     def _format(self):
         u = self.url.lower()
@@ -155,8 +167,9 @@ class AIClient:
 
     def _ask_openai(self, prompt):
         messages = []
-        if self.system:
-            messages.append({"role": "system", "content": self.system})
+        lang_instr = self._language_instruction()
+        full_system = lang_instr + "\n\n" + self.system if self.system else lang_instr
+        messages.append({"role": "system", "content": full_system})
         messages.append({"role": "user", "content": prompt})
         body = {
             "model": self.model,
@@ -184,7 +197,8 @@ class AIClient:
         raise AIError("Respuesta no reconocida: " + json.dumps(result)[:300])
 
     def _ask_ollama_generate(self, prompt):
-        full = (self.system + "\n\n" if self.system else "") + prompt
+        lang_instr = self._language_instruction()
+        full = (lang_instr + "\n\n" + self.system + "\n\n" if self.system else lang_instr + "\n\n") + prompt
         body = {
             "model": self.model,
             "prompt": full,
@@ -197,8 +211,9 @@ class AIClient:
 
     def _ask_ollama_chat(self, prompt):
         messages = []
-        if self.system:
-            messages.append({"role": "system", "content": self.system})
+        lang_instr = self._language_instruction()
+        full_system = lang_instr + "\n\n" + self.system if self.system else lang_instr
+        messages.append({"role": "system", "content": full_system})
         messages.append({"role": "user", "content": prompt})
         body = {
             "model": self.model,
@@ -219,8 +234,11 @@ class AIClient:
             "temperature": self.temperature,
             "messages": [{"role": "user", "content": prompt}],
         }
+        lang_instr = self._language_instruction()
         if self.system:
-            body["system"] = self.system
+            body["system"] = lang_instr + "\n\n" + self.system
+        else:
+            body["system"] = lang_instr
         headers = {
             "Content-Type": "application/json",
             "anthropic-version": "2023-06-01",
@@ -241,8 +259,9 @@ class AIClient:
             "model": self.model,
             "messages": [{"role": "user", "content": prompt}],
         }
-        if self.system:
-            body["messages"].insert(0, {"role": "system", "content": self.system})
+        lang_instr = self._language_instruction()
+        full_system = lang_instr + "\n\n" + self.system if self.system else lang_instr
+        body["messages"].insert(0, {"role": "system", "content": full_system})
         headers = {"Content-Type": "application/json"}
         if self.key:
             headers["Authorization"] = "Bearer " + self.key

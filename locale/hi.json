@@ -30,6 +30,7 @@
     "lbl.url": "API URL",
     "lbl.model": "मॉडल",
     "lbl.key": "API कुंजी",
+    "lbl.timeout": "टाइमआउट (सेकंड):",
     "lbl.sys_preset": "सिस्टम प्रीसेट",
     "lbl.sys_prompt": "सिस्टम संकेत",
     "chk.web_search": "वेब खोज सक्षम करें",

@@ -30,6 +30,7 @@
     "lbl.url": "URL da API",
     "lbl.model": "Modelo",
     "lbl.key": "Chave da API",
+    "lbl.timeout": "Timeout (segundos):",
     "lbl.sys_preset": "Preset do sistema",
     "lbl.sys_prompt": "Prompt do sistema",
     "chk.web_search": "Habilitar busca na web",

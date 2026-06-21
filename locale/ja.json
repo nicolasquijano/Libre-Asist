@@ -30,6 +30,7 @@
     "lbl.url": "API URL",
     "lbl.model": "モデル",
     "lbl.key": "APIキー",
+    "lbl.timeout": "タイムアウト（秒）:",
     "lbl.sys_preset": "システムプリセット",
     "lbl.sys_prompt": "システムプロンプト",
     "chk.web_search": "ウェブ検索を有効にする",

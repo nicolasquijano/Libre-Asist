@@ -30,6 +30,7 @@
     "lbl.url": "API URL",
     "lbl.model": "মডেল",
     "lbl.key": "API কী",
+    "lbl.timeout": "টাইমআউট (সেকেন্ড):",
     "lbl.sys_preset": "সিস্টেম প্রিসেট",
     "lbl.sys_prompt": "সিস্টেম প্রম্পট",
     "chk.web_search": "ওয়েব সার্চ সক্রিয় করুন",

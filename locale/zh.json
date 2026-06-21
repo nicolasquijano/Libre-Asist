@@ -16,6 +16,7 @@
   "lbl.url": "API 地址：",
   "lbl.model": "模型：",
   "lbl.key": "API 密钥：",
+  "lbl.timeout": "超时（秒）：",
   "lbl.sys_preset": "系统预设：",
   "lbl.sys_prompt": "系统提示：",
   "chk.web_search": "启用网络搜索 (web_search 工具)",

@@ -38,6 +38,9 @@ not possible from system Python, only from the LO Python bridge).
 | --- | --- |
 | `__init__.py` | LO entry points; sys.path bootstrap. |
 | `config.py` | JSON config at `~/.config/libreoffice/4/user/libre_asist/config.json`. Provider presets, system-prompt presets, `load()` / `save()` / `apply_preset()`. |
+| `i18n.py` | Internationalization: `load()` (reads `locale/{lang}.json`), `detect_language()` (queries LO's `PackageInformationProvider` singleton for the UI locale, falls back to `"es"`), `_("key", *args)` (lookup + `str.format()` substitution). |
+| `locale/es.json` | Spanish translations (source of truth — every key originally authored here). |
+| `locale/en.json` | English translations (full coverage of all keys in `es.json`). |
 | `ai_client.py` | Multi-provider HTTP client (`AIClient`). Auto-detects OpenAI, Ollama native, Anthropic, and MiniMax-native from the API URL. Optional `web_search` tool with tool-calling loop. |
 | `web_search.py` | DuckDuckGo HTML backend, stdlib only. Returns `[{title,url,snippet}]`. |
 | `prompts.py` | Thin compat wrapper around `skills_common.chat`. |
@@ -98,10 +101,16 @@ not possible from system Python, only from the LO Python bridge).
   change cell must be in this set or in `generated_allowed_cells` (used
   when creating new structure) / `summary_allowed_cells` /
   `audit_report_allowed_cells` for the corresponding target sheets.
-- **Spanish-first copy.** All user-facing strings, system prompts,
-  validators, and suggestion messages are in Spanish. Model replies
-  are Spanish unless the user writes in English. Prompts instruct
-  the model to match the user's language.
+- **Spanish-first copy with i18n.** All user-facing strings (UI labels,
+  buttons, status messages, errors, suggestions, info messages,
+  validation errors, system prompts) go through `_("key", *args)` from
+  `i18n.py`. The actual text lives in `locale/es.json` (Spanish, source
+  of truth) and `locale/en.json` (English translations). The active
+  locale is detected from LibreOffice's
+  `com.sun.star.deployment.PackageInformationProvider` singleton
+  (`getImplementationLocale()`) — falls back to `"es"` on any error.
+  Model replies match the user's language; prompts instruct the model
+  accordingly.
 - **JSON proposals must be wrapped in a single ```json fenced code
   block.** `actions.extract_json` is forgiving (regex search then
   bracket-fallback) but the skills tell the model to return exactly one
@@ -250,7 +259,7 @@ matching branch in `skills_calc.calc_preview` /
   but the user config lives at `~/.config/libreoffice/4/user/libre_asist/config.json`
   (note the different `libre_asist` directory). This is intentional —
   config survives LibreOffice reinstalls.
-- `panel.py:1` contains `# CACHE_BUSTER: 1781319001`. If you change
+- `panel.py:1` contains `# CACHE_BUSTER: 1781326001`. If you change
   the panel and the dialog doesn't update inside LibreOffice, bump
   this number. LibreOffice caches Python bytecode aggressively and
   sometimes won't re-import changed files until the file's mtime
@@ -299,6 +308,34 @@ matching branch in `skills_calc.calc_preview` /
   bytecode immediately (LibreOffice invalidates `.pyc` on mtime
   change), but the dialog itself caches the module reference
   across reopens — see the CACHE_BUSTER note above.
+
+## i18n
+
+- All user-facing strings flow through `_("key", *args)` from `i18n.py`.
+  The lookup walks `locale/{lang}.json`; missing keys fall back to
+  `es.json` and finally to the key literal so a missing entry never
+  crashes the panel.
+- Locale keys are short semantic identifiers (e.g. `panel.title`,
+  `error.no_doc`, `actions.error.writer_font_size`), **not** raw text.
+  This keeps the keys stable when translations are revised.
+- `_()` runs `str.format()` on the value, so use `{0}`, `{1}` …
+  placeholders when the string needs runtime values:
+  `_("info.changes_applied", count)` → `"Aplicado: {0} cambio(s)."`.
+- `detect_language()` queries LibreOffice's
+  `com.sun.star.deployment.PackageInformationProvider` singleton via
+  UNO and returns the first two letters of `getImplementationLocale()`
+  (e.g. `"es"`, `"en"`). Any exception → `"es"`.
+- To add a new key: add the entry to `locale/es.json` first (it is
+  the source of truth and the fallback), then the matching translation
+  in `locale/en.json` (and any other locale files). Always key the
+  JSON entries with the same identifier; never duplicate raw text as
+  a key.
+- To add a new language: create `locale/<lang>.json` with the full
+  key set from `es.json`. The detect function already lowercases and
+  takes the first two characters, so codes like `en`, `es`, `pt`,
+  `fr` work without extra wiring.
+- Strings that are NOT user-facing (LO dispatch keys, JSON field
+  names, regex anchors, debug logs) must remain as raw literals.
 
 ## Things not to change casually
 
