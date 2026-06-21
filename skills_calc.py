@@ -291,76 +291,142 @@ def calc_data_validation(user_prompt, ctx):
     )
 
 
+def calc_apply_theme(user_prompt, ctx):
+    return _block(
+        "You are a styling expert for LibreOffice Calc.",
+        "Apply a professional theme to the selected data range.\n\nRequest: " + user_prompt,
+        ctx,
+        COMMON_RULES + "\n- This applies a predefined color theme to a range.\n- Use the range from context (e.g., '" + (ctx.get("range") or "A1:E20") + "') as the range.\n- Theme options: corporativo (blue), analisis (green), presentacion (purple), azul_profesional, verde_financiero, moderno (gray).\n- include_totals: set to true if last row contains totals.\n- Headers get bold text and theme background color.\n- Alternating rows get subtle background colors.\n- Borders are applied for clean look.\n- Do NOT return regular cell changes.",
+        "Return a single JSON in ```json with this contract:\n" + CALC_THEME_SCHEMA,
+        'Request: "Apply corporate theme"\n```json\n{"action":"apply_theme","summary":"Applies corporate theme","range":"A1:E20","theme_name":"corporativo","include_totals":false}\n```',
+    )
+
+
+def calc_generate_macro(user_prompt, ctx):
+    return _block(
+        "You are a LibreOffice Basic macro expert.",
+        "Generate LibreOffice Basic code for the requested automation.\n\nRequest: " + user_prompt,
+        ctx,
+        COMMON_RULES + "\n- This generates LibreOffice Basic macro code.\n- Return ONLY the macro code, no explanations, no JSON.\n- Use proper Basic syntax with Sub/End Sub.\n- Include comments in Spanish explaining the code.\n- The code should be ready to paste into a Basic module.\n- Do NOT return JSON or any other format.",
+        "Return ONLY the LibreOffice Basic macro code in a code block.\nDo NOT add explanations outside the code block.",
+        "Request: Create a macro to format all headers in bold\n```basic\nSub FormatearEncabezados\n    REM Formatea todas las celdas de encabezado en negrita\n    Dim oDoc As Object\n    Dim oHoja As Object\n    Dim oCelda As Object\n    Dim i As Long\n    \n    oDoc = ThisComponent\n    oHoja = oDoc.getSheets().getByIndex(0)\n    \n    For i = 0 To oHoja.getColumns().getCount() - 1\n        oCelda = oHoja.getCellByPosition(i, 0)\n        oCelda.CharWeight = com.sun.star.awt.FontWeight.BOLD\n    Next i\n    \n    MsgBox \"Encabezados formateados exitosamente!\", 64, \"Libre Asist\"\nEnd Sub\n```",
+    )
+
+
+def calc_icon_conditional_format(user_prompt, ctx):
+    return _block(
+        "You are a data visualization expert for LibreOffice Calc.",
+        "Apply icon-based conditional formatting (traffic lights, arrows, gauges) to a range.\n\nRequest: " + user_prompt,
+        ctx,
+        COMMON_RULES + "\n- This applies icon-based conditional formatting to a range.\n- Use the range from context (e.g., A1:A10) as the cell_range.\n- icon_style options: traffic_light, arrows_up_down, arrows_gray, stars, bars.\n- thresholds: list of values like [33, 67] for traffic light ranges.\n- Do NOT return regular cell changes.",
+        "Return a single JSON in ```json with this contract:\n" + CALC_CONDITIONAL_FORMAT_SCHEMA,
+        'Request: Add traffic light icons for status column\n```json\n{"action":"apply_conditional_format","summary":"Adds traffic light icons","cell_range":"A1:A10","condition":"greater","value":0,"style_type":"icon","style_value":"traffic_light"}\n```',
+    )
+
+
+def calc_preview(user_prompt, ctx):
+    return _block(
+        "You are a data filtering expert for LibreOffice Calc.",
+        "Apply a filter to the selected data range.\n\nRequest: " + user_prompt,
+        ctx,
+        COMMON_RULES + "\n- This applies an autofilter to a range.\n- Use the range from context (e.g., '" + (ctx.get("range") or "A1:E20") + "') as the range.\n- filter_type: autofilter adds dropdown buttons to column headers.\n- criteria: advanced filter with specific conditions (future).\n- show_filter_buttons: whether to show filter dropdowns.\n- Do NOT return regular cell changes.",
+        "Return a single JSON in ```json with this contract:\n" + CALC_FILTER_SCHEMA,
+        'Request: "Apply filter to this data"\n```json\n{"action":"apply_filter","summary":"Applies autofilter","range":"A1:E20","filter_type":"autofilter","show_filter_buttons":true}\n```',
+    )
+
+
+def calc_apply_protection(user_prompt, ctx):
+    return _block(
+        "You are a spreadsheet protection expert for LibreOffice Calc.",
+        "Apply or remove protection from a sheet.\n\nRequest: " + user_prompt,
+        ctx,
+        COMMON_RULES + "\n- This protects or unprotects a sheet.\n- sheet_name: name of the sheet to protect (optional, uses active sheet).\n- protect: true to protect, false to unprotect.\n- password: optional password for protection.\n- protect_formulas: if true, formulas are also protected.\n- Do NOT return regular cell changes.",
+        "Return a single JSON in ```json with this contract:\n" + CALC_PROTECTION_SCHEMA,
+        'Request: "Protect this sheet"\n```json\n{"action":"apply_protection","summary":"Protects sheet","protect":true,"password":null,"protect_formulas":true}\n```',
+    )
+
+
 def calc_preview(user_prompt, ctx):
     lower = user_prompt.lower()
+    # Charts
     if any(word in lower for word in (
-        "crear grafico", "creá grafico", "crear gráfico", "creá gráfico",
-        "grafico de barras", "gráfico de barras", "grafico lineal", "gráfico lineal",
-        "grafico de torta", "gráfico de torta", "grafico circular", "gráfico circular",
-        "grafico de lineas", "gráfico de líneas", "grafico area", "gráfico área",
-        "make chart", "create chart", "bar chart", "line chart", "pie chart", "area chart",
-        "scatter plot", "grafico", "chart",
+        "create chart", "make chart", "bar chart", "line chart", "pie chart", "area chart",
+        "scatter plot", "build chart", "generate chart",
     )):
         return calc_create_chart(user_prompt, ctx)
+    # Pivot tables
     if any(word in lower for word in (
-        "reporte de auditoria", "reporte de auditoría", "informe de auditoria", "informe de auditoría",
-        "hoja de auditoria", "hoja de auditoría", "crear auditoria", "creá auditoría",
-        "crear auditoría", "creá auditoria",
-        "audit report", "create audit", "make audit", "build audit",
-    )):
-        return calc_audit_report(user_prompt, ctx)
-    if any(word in lower for word in (
-        "tabla dinamica real", "tabla dinámica real", "datapilot", "data pilot",
-        "pivot table real", "crear pivot", "creá pivot", "tabla cruzada",
-        "real pivot", "true pivot", "pivot verdadero",
+        "pivot table", "datapilot", "data pilot", "pivot", "cross table",
     )):
         return calc_pivot_table(user_prompt, ctx)
+    # Consolidate sheets
     if any(word in lower for word in (
-        "consolidar hoja", "consolidar hojas", "consolidá hoja", "consolidá hojas",
-        "combinar hoja", "combinar hojas", "combina hoja", "combina hojas",
-        "unir hoja", "unir hojas", "une hoja", "une hojas",
-        "juntar datos", "juntar hojas", "aggregate sheets", "merge sheets",
-        "consolidate sheets", "combine sheets", "join sheets",
+        "consolidate", "combine sheets", "merge sheets", "join sheets",
+        "aggregate sheets", "merge data",
     )):
         return calc_consolidate(user_prompt, ctx)
+    # Summary table
     if any(word in lower for word in (
-        "tabla resumen", "resumen por", "reporte por",
-        "sumá importes por", "suma importes por", "crear resumen", "creá resumen", "hoja de resumen",
-        "summary table", "summary by", "report by", "sum amounts by", "create summary",
+        "summary table", "summary by", "create summary", "sum amounts by",
+        "report by", "aggregate",
     )):
         return calc_summary_table_builder(user_prompt, ctx)
+    # Formula audit
     if any(word in lower for word in (
-        "audita formula", "auditá formula", "auditar formula", "audita fórmula",
-        "auditá fórmula", "auditar fórmula", "formulas rotas", "fórmulas rotas",
-        "formula inconsistente", "fórmula inconsistente",
         "audit formula", "audit formulas", "broken formula", "broken formulas",
-        "inconsistent formula", "inconsistent formulas",
+        "formula error", "formulas rotas",
     )):
         return calc_formula_audit(user_prompt, ctx)
+    # Audit sheet
     if any(word in lower for word in (
-        "audita", "auditá", "auditar", "riesgo", "riesgos", "controla", "controlá",
-        "controlar totales", "problemas de calidad",
-        "audit", "risk", "risks", "quality issues", "data quality",
+        "audit", "audit report", "risk", "quality issues", "data quality",
     )):
         return calc_audit_sheet(user_prompt, ctx)
+    # Reconciliation
     if any(word in lower for word in (
-        "conciliacion", "conciliación", "conciliar", "banco", "bancaria", "bancario",
-        "extracto", "movimientos bancarios", "libro banco",
-        "reconciliation", "reconcile", "bank", "banking", "bank statement", "movements", "ledger",
+        "reconciliation", "reconcile", "bank reconciliation", "bank statement",
+        "conciliación", "conciliar",
     )):
         return calc_reconciliation_advanced(user_prompt, ctx)
+    # Conditional format
     if any(word in lower for word in (
-        "formato condicional", "formato condicionales", "resaltar si", "resaltar celdas",
-        "color segun valor", "color según valor", "negrita si", "rojo si", "verde si",
-        "conditional format", "highlight if", "color if", "bold if", "format if",
+        "conditional format", "highlight if", "color if", "bold if",
+        "format if", "color by value",
     )):
         return calc_conditional_format(user_prompt, ctx)
+    # Data validation
     if any(word in lower for word in (
-        "validacion de datos", "validación de datos", "lista desplegable", "dropdown",
-        "restringir celda", "restringir valor", "permitir solo", "rango numerico",
-        "data validation", "input validation", "restrict cell", "allow only",
+        "data validation", "dropdown", "input validation", "restrict cell",
+        "validación de datos",
     )):
         return calc_data_validation(user_prompt, ctx)
+    # Theme
+    if any(word in lower for word in (
+        "apply theme", "theme", "style", "corporate style", "professional colors",
+        "estilo", "tema",
+    )):
+        return calc_apply_theme(user_prompt, ctx)
+    # Filter
+    if any(word in lower for word in (
+        "apply filter", "autofilter", "filter data", "filter",
+    )):
+        return calc_apply_filter(user_prompt, ctx)
+    # Protection
+    if any(word in lower for word in (
+        "protect", "unprotect", "lock", "protect sheet", "protect cells",
+        "bloquear", "proteger",
+    )):
+        return calc_apply_protection(user_prompt, ctx)
+    # Macro
+    if any(word in lower for word in (
+        "macro", "basic code", "automation", "create macro", "generate macro",
+    )):
+        return calc_generate_macro(user_prompt, ctx)
+    # Icon conditional format
+    if any(word in lower for word in (
+        "traffic light", "icon", "data bars", "icon sets", "semaforo",
+    )):
+        return calc_icon_conditional_format(user_prompt, ctx)
     if any(word in lower for word in (
         "presupuesto", "inventario", "cronograma", "flujo de caja", "cashflow",
         "control de gastos", "crear hoja", "crea una hoja", "crear tabla", "crea una tabla",

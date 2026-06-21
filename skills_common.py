@@ -41,6 +41,21 @@ CALC_DATA_VALIDATION_SCHEMA = (
     '"show_error":true,"error_title":"Error","error_message":"Valor no valido","error_style":"stop"}'
 )
 
+CALC_THEME_SCHEMA = (
+    '{"action":"apply_theme","summary":"Apply theme",'
+    '"range":"A1:E20","theme_name":"corporativo","include_totals":false}'
+)
+
+CALC_FILTER_SCHEMA = (
+    '{"action":"apply_filter","summary":"Apply filter",'
+    '"range":"A1:E20","filter_type":"autofilter","criteria":null,"show_filter_buttons":true}'
+)
+
+CALC_PROTECTION_SCHEMA = (
+    '{"action":"apply_protection","summary":"Apply protection",'
+    '"sheet_name":null,"protect":true,"password":null,"protect_formulas":true}'
+)
+
 WRITER_ACTION_SCHEMA = (
     '{"action":"replace_selection","text":"final text","summary":"brief summary",'
     '"style":{"font_size":12,"font_name":"Liberation Sans","bold":false,"italic":false,'
@@ -136,6 +151,9 @@ __all__ = [
     "CALC_CHART_SCHEMA",
     "CALC_CONDITIONAL_FORMAT_SCHEMA",
     "CALC_DATA_VALIDATION_SCHEMA",
+    "CALC_THEME_SCHEMA",
+    "CALC_FILTER_SCHEMA",
+    "CALC_PROTECTION_SCHEMA",
     "WRITER_ACTION_SCHEMA",
     "WRITER_LIST_SCHEMA",
     "WRITER_HYPERLINK_SCHEMA",

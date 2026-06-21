@@ -350,6 +350,102 @@ def _validate_data_validation(data):
     return out
 
 
+def _validate_apply_theme(data):
+    """Validate an apply theme action."""
+    out = {
+        "action": "apply_theme",
+        "summary": str(data.get("summary", "Aplicar tema")),
+    }
+
+    # Validate range (optional)
+    range_str = data.get("range")
+    if range_str:
+        range_str = str(range_str).strip()
+        if range_str and not re.match(r'^[A-Z]+\d+(:[A-Z]+\d+)?$', range_str, re.I):
+            raise ValueError("range debe ser un rango válido (ej: A1:E20)")
+        out["range"] = range_str
+    else:
+        out["range"] = None
+
+    # Validate theme_name (optional, default corporativo)
+    theme_name = str(data.get("theme_name", "corporativo")).lower()
+    valid_themes = {"corporativo", "analisis", "presentacion", "azul_profesional", "verde_financiero", "moderno"}
+    if theme_name not in valid_themes:
+        raise ValueError(f"Tema '{theme_name}' no válido. Use: {', '.join(valid_themes)}")
+    out["theme_name"] = theme_name
+
+    # Validate include_totals (optional, default False)
+    out["include_totals"] = bool(data.get("include_totals", False))
+
+    return out
+
+
+def _validate_apply_filter(data):
+    """Validate an apply filter action."""
+    out = {
+        "action": "apply_filter",
+        "summary": str(data.get("summary", "Aplicar filtro")),
+    }
+
+    # Validate range (optional)
+    range_str = data.get("range")
+    if range_str:
+        range_str = str(range_str).strip()
+        if range_str and not re.match(r'^[A-Z]+\d+(:[A-Z]+\d+)?$', range_str, re.I):
+            raise ValueError("range debe ser un rango válido (ej: A1:E20)")
+        out["range"] = range_str
+    else:
+        out["range"] = None
+
+    # Validate filter_type (optional, default autofilter)
+    filter_type = str(data.get("filter_type", "autofilter")).lower()
+    valid_types = {"autofilter", "advanced"}
+    if filter_type not in valid_types:
+        raise ValueError(f"Tipo de filtro '{filter_type}' no válido. Use: {', '.join(valid_types)}")
+    out["filter_type"] = filter_type
+
+    # Validate criteria (optional)
+    out["criteria"] = data.get("criteria")
+
+    # Validate show_filter_buttons (optional, default True)
+    out["show_filter_buttons"] = bool(data.get("show_filter_buttons", True))
+
+    return out
+
+
+def _validate_apply_protection(data):
+    """Validate an apply protection action."""
+    out = {
+        "action": "apply_protection",
+        "summary": str(data.get("summary", "Aplicar protección")),
+    }
+
+    # Validate sheet_name (optional)
+    sheet_name = data.get("sheet_name")
+    if sheet_name:
+        sheet_name = str(sheet_name).strip()
+        if len(sheet_name) > 31 or any(ch in sheet_name for ch in (":", "\\", "/", "?", "*", "[", "]")):
+            raise ValueError(_("actions.error.invalid_sheet_name", sheet_name))
+        out["sheet_name"] = sheet_name
+    else:
+        out["sheet_name"] = None
+
+    # Validate protect (optional, default True)
+    out["protect"] = bool(data.get("protect", True))
+
+    # Validate password (optional)
+    password = data.get("password")
+    if password:
+        out["password"] = str(password)
+    else:
+        out["password"] = None
+
+    # Validate protect_formulas (optional, default True)
+    out["protect_formulas"] = bool(data.get("protect_formulas", True))
+
+    return out
+
+
 def extract_json(text):
     if not text:
         raise ValueError(_("actions.error.empty_response"))
@@ -389,6 +485,18 @@ def validate_calc_preview(data, allowed_cells=None):
     # Handle data validation action
     if action == "apply_data_validation":
         return _validate_data_validation(data)
+
+    # Handle apply theme action
+    if action == "apply_theme":
+        return _validate_apply_theme(data)
+
+    # Handle apply filter action
+    if action == "apply_filter":
+        return _validate_apply_filter(data)
+
+    # Handle apply protection action
+    if action == "apply_protection":
+        return _validate_apply_protection(data)
 
     changes = data.get("changes")
     if not isinstance(changes, list) or not changes:

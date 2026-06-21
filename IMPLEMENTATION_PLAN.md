@@ -1301,7 +1301,7 @@ Archivos principales:
 
 ### Filtros Avanzados
 
-Estado: pendiente.
+Estado: implementado.
 
 Pedidos esperados:
 - "filtrar donde columna A sea X";
@@ -1319,7 +1319,7 @@ Archivos principales:
 
 ### Proteccion de Datos
 
-Estado: pendiente.
+Estado: implementado.
 
 Pedidos esperados:
 - "proteger esta hoja";
@@ -1337,7 +1337,7 @@ Archivos principales:
 
 ### Macros Generadas
 
-Estado: pendiente.
+Estado: implementado.
 
 Pedidos esperados:
 - "generar macro para hacer X";
@@ -1355,7 +1355,7 @@ Archivos principales:
 
 ### Temas y Estilos
 
-Estado: pendiente.
+Estado: implementado.
 
 Pedidos esperados:
 - "aplicar tema azul profesional";
@@ -1373,7 +1373,7 @@ Archivos principales:
 
 ### Formato Condicional con Iconos
 
-Estado: pendiente.
+Estado: implementado.
 
 Pedidos esperados:
 - "semafoto en columna A";

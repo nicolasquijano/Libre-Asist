@@ -19,7 +19,7 @@ def detect_language():
         loc = cp.getImplementationLocale()
         return loc.split("-")[0].split("_")[0]
     except Exception:
-        return "es"
+        return "en"
 
 
 def load(lang=None):
@@ -32,6 +32,15 @@ def load(lang=None):
         with open(path, encoding="utf-8") as f:
             _STRINGS.clear()
             _STRINGS.update(json.load(f))
+    else:
+        # Fallback to English if locale not found
+        lang = "en"
+        _LANG = lang
+        path = os.path.join(_LOCALE_DIR, f"{lang}.json")
+        if os.path.isfile(path):
+            with open(path, encoding="utf-8") as f:
+                _STRINGS.clear()
+                _STRINGS.update(json.load(f))
 
 
 def _(key, *args, **kwargs):
