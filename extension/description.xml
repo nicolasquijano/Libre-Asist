@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<description xmlns="http://openoffice.org/extensions/description/2006"
+             xmlns:dep="http://openoffice.org/extensions/description/2006/dependencies">
+    <identifier value="com.libre_asist.panelasist"/>
+    <version value="1.0.0"/>
+    <name>Libre Asist</name>
+    <vendor>Libre Asist</vendor>
+    <publisher>Libre Asist</publisher>
+    <license>MPL-2.0</license>
+    <license-detail-text>Mozilla Public License 2.0</license-detail-text>
+    <description>Asistente de IA para LibreOffice Calc y Writer. Escribe en lenguaje natural y el asistente propone cambios para tu documento.</description>
+    <icon>
+        <default xlink:href="Images/icon.png" xmlns:xlink="http://www.w3.org/1999/xlink"/>
+    </icon>
+    <target>
+        <list>
+            <target-name>Writer</target-name>
+            <target-name>Calc</target-name>
+        </list>
+    </target>
+    <registration>
+        <simple license-type="internal"/>
+    </registration>
+    <dependencies>
+        <java xmlns="http://openoffice.org/extensions/description/2006/dependencies">
+            <java-version value="1.8"/>
+        </java>
+    </dependencies>
+</description>
