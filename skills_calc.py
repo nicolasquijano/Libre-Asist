@@ -225,6 +225,17 @@ def calc_profile_data(ctx):
     )
 
 
+def calc_consolidate(user_prompt, ctx):
+    return _block(
+        "You are a data consolidation specialist for LibreOffice Calc.",
+        "Consolidate data from multiple sheets into a single summary sheet.\n\nRequest: " + user_prompt,
+        ctx,
+        COMMON_RULES + "\n- This action consolidates data from multiple sheets into one.\n- Use source_sheets to list specific sheet names, or omit to use all sheets.\n- Set has_headers=true if the first row contains column headers.\n- The destination sheet will be named as specified (default: 'Consolidado').\n- Headers from the first sheet will be used; data rows from all sheets will be combined.\n- Do not alter the source sheets.",
+        "Return a single JSON in ```json with this contract:\n" + CALC_CONSOLIDATE_SCHEMA,
+        'Request: "Consolidate Hoja1 and Hoja2"\n```json\n{"action":"consolidate_sheets","summary":"Consolidates data from Hoja1 and Hoja2","source_sheets":["Hoja1","Hoja2"],"dest_sheet_name":"Consolidado","has_headers":true}\n```',
+    )
+
+
 def calc_format(user_prompt, ctx):
     return _block(
         "You are a formatting specialist for LibreOffice Calc spreadsheets.",
@@ -247,8 +258,50 @@ def calc_format_table(user_prompt, ctx):
     )
 
 
+def calc_create_chart(user_prompt, ctx):
+    return _block(
+        "You are a data visualization expert for LibreOffice Calc.",
+        "Create a chart from the selected data range.\n\nRequest: " + user_prompt,
+        ctx,
+        COMMON_RULES + "\n- This creates a real chart in the spreadsheet.\n- Use the range from context (e.g., '" + (ctx.get("range") or "A1:B10") + "') as the source_range.\n- chart_type options: bar, line, pie, area, scatter.\n- title is optional and sets the chart title.\n- dest_cell is where the chart will be placed (default: A1).\n- Do NOT return regular cell changes; return the chart action.\n- Detect if data has labels in first column or first row to set up the chart correctly.",
+        "Return a single JSON in ```json with this contract:\n" + CALC_CHART_SCHEMA,
+        'Request: "Create a bar chart with sales data"\n```json\n{"action":"create_chart","summary":"Creates bar chart from sales data","source_range":"A1:B12","chart_type":"bar","title":"Ventas por Mes","dest_cell":"D1"}\n```',
+    )
+
+
+def calc_conditional_format(user_prompt, ctx):
+    return _block(
+        "You are a formatting expert for LibreOffice Calc.",
+        "Apply conditional formatting to a cell range based on conditions.\n\nRequest: " + user_prompt,
+        ctx,
+        COMMON_RULES + "\n- This applies conditional formatting to a range.\n- Use the range from context (e.g., '" + (ctx.get("range") or "A1:A10") + "') as the cell_range.\n- condition options: greater, less, equal, between, contains.\n- value is the threshold (number, text, or date) for the condition.\n- style_type: color (font color), background (cell color), bold, italic.\n- style_value: hex color like #FF0000 or true/false for bold/italic.\n- Do NOT return regular cell changes.",
+        "Return a single JSON in ```json with this contract:\n" + CALC_CONDITIONAL_FORMAT_SCHEMA,
+        'Request: "Highlight values greater than 1000 in red"\n```json\n{"action":"apply_conditional_format","summary":"Highlights values > 1000 in red","cell_range":"A1:A10","condition":"greater","value":1000,"style_type":"color","style_value":"#FF0000"}\n```',
+    )
+
+
+def calc_data_validation(user_prompt, ctx):
+    return _block(
+        "You are a data validation expert for LibreOffice Calc.",
+        "Apply data validation (dropdown lists, number ranges, dates) to a cell range.\n\nRequest: " + user_prompt,
+        ctx,
+        COMMON_RULES + "\n- This applies data validation to a range.\n- Use the range from context (e.g., '" + (ctx.get("range") or "A1:A10") + "') as the cell_range.\n- validation_type: list (dropdown), number, date, time, textlength.\n- formula1: for list use semicolon-separated values like 'Si;No;Talvez'.\n- For number/date use a value like 100 or '>=10'.\n- show_input_message: show tooltip when cell is selected.\n- show_error: show error when invalid data entered.\n- error_style: stop (blocks input), warning, information.\n- Do NOT return regular cell changes.",
+        "Return a single JSON in ```json with this contract:\n" + CALC_DATA_VALIDATION_SCHEMA,
+        'Request: "Add dropdown with Si, No, Talvez"\n```json\n{"action":"apply_data_validation","summary":"Adds dropdown list","cell_range":"A1:A10","validation_type":"list","formula1":"Si;No;Talvez","show_input_message":true,"input_title":"Seleccionar","input_message":"Elija una opcion","show_error":true,"error_title":"Error","error_message":"Valor no valido","error_style":"stop"}\n```',
+    )
+
+
 def calc_preview(user_prompt, ctx):
     lower = user_prompt.lower()
+    if any(word in lower for word in (
+        "crear grafico", "creá grafico", "crear gráfico", "creá gráfico",
+        "grafico de barras", "gráfico de barras", "grafico lineal", "gráfico lineal",
+        "grafico de torta", "gráfico de torta", "grafico circular", "gráfico circular",
+        "grafico de lineas", "gráfico de líneas", "grafico area", "gráfico área",
+        "make chart", "create chart", "bar chart", "line chart", "pie chart", "area chart",
+        "scatter plot", "grafico", "chart",
+    )):
+        return calc_create_chart(user_prompt, ctx)
     if any(word in lower for word in (
         "reporte de auditoria", "reporte de auditoría", "informe de auditoria", "informe de auditoría",
         "hoja de auditoria", "hoja de auditoría", "crear auditoria", "creá auditoría",
@@ -262,6 +315,14 @@ def calc_preview(user_prompt, ctx):
         "real pivot", "true pivot", "pivot verdadero",
     )):
         return calc_pivot_table(user_prompt, ctx)
+    if any(word in lower for word in (
+        "consolidar hoja", "consolidar hojas", "consolidá hoja", "consolidá hojas",
+        "combinar hoja", "combinar hojas", "combina hoja", "combina hojas",
+        "unir hoja", "unir hojas", "une hoja", "une hojas",
+        "juntar datos", "juntar hojas", "aggregate sheets", "merge sheets",
+        "consolidate sheets", "combine sheets", "join sheets",
+    )):
+        return calc_consolidate(user_prompt, ctx)
     if any(word in lower for word in (
         "tabla resumen", "resumen por", "reporte por",
         "sumá importes por", "suma importes por", "crear resumen", "creá resumen", "hoja de resumen",
@@ -288,6 +349,18 @@ def calc_preview(user_prompt, ctx):
         "reconciliation", "reconcile", "bank", "banking", "bank statement", "movements", "ledger",
     )):
         return calc_reconciliation_advanced(user_prompt, ctx)
+    if any(word in lower for word in (
+        "formato condicional", "formato condicionales", "resaltar si", "resaltar celdas",
+        "color segun valor", "color según valor", "negrita si", "rojo si", "verde si",
+        "conditional format", "highlight if", "color if", "bold if", "format if",
+    )):
+        return calc_conditional_format(user_prompt, ctx)
+    if any(word in lower for word in (
+        "validacion de datos", "validación de datos", "lista desplegable", "dropdown",
+        "restringir celda", "restringir valor", "permitir solo", "rango numerico",
+        "data validation", "input validation", "restrict cell", "allow only",
+    )):
+        return calc_data_validation(user_prompt, ctx)
     if any(word in lower for word in (
         "presupuesto", "inventario", "cronograma", "flujo de caja", "cashflow",
         "control de gastos", "crear hoja", "crea una hoja", "crear tabla", "crea una tabla",

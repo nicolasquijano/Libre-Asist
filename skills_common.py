@@ -17,6 +17,30 @@ CALC_PIVOT_SCHEMA = (
     '"dest_cell":"G1","dest_sheet":"Pivot IA"}'
 )
 
+CALC_CONSOLIDATE_SCHEMA = (
+    '{"action":"consolidate_sheets","summary":"Consolidate sheets",'
+    '"source_sheets":["Hoja1","Hoja2"],"dest_sheet_name":"Consolidado","has_headers":true}'
+)
+
+CALC_CHART_SCHEMA = (
+    '{"action":"create_chart","summary":"Create chart",'
+    '"source_range":"A1:B10","chart_type":"bar","title":"Ventas por Mes",'
+    '"dest_cell":"D1","dest_sheet_name":null}'
+)
+
+CALC_CONDITIONAL_FORMAT_SCHEMA = (
+    '{"action":"apply_conditional_format","summary":"Apply conditional format",'
+    '"cell_range":"A1:A10","condition":"greater","value":1000,'
+    '"style_type":"color","style_value":"#FF0000"}'
+)
+
+CALC_DATA_VALIDATION_SCHEMA = (
+    '{"action":"apply_data_validation","summary":"Apply data validation",'
+    '"cell_range":"A1:A10","validation_type":"list","formula1":"Si;No;Talvez",'
+    '"show_input_message":true,"input_title":"Seleccionar","input_message":"Elija una opcion",'
+    '"show_error":true,"error_title":"Error","error_message":"Valor no valido","error_style":"stop"}'
+)
+
 WRITER_ACTION_SCHEMA = (
     '{"action":"replace_selection","text":"final text","summary":"brief summary",'
     '"style":{"font_size":12,"font_name":"Liberation Sans","bold":false,"italic":false,'
@@ -108,6 +132,10 @@ COMMON_RULES = """
 __all__ = [
     "CALC_ACTION_SCHEMA",
     "CALC_PIVOT_SCHEMA",
+    "CALC_CONSOLIDATE_SCHEMA",
+    "CALC_CHART_SCHEMA",
+    "CALC_CONDITIONAL_FORMAT_SCHEMA",
+    "CALC_DATA_VALIDATION_SCHEMA",
     "WRITER_ACTION_SCHEMA",
     "WRITER_LIST_SCHEMA",
     "WRITER_HYPERLINK_SCHEMA",

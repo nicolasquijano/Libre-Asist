@@ -203,6 +203,153 @@ def _validate_pivot_table(data):
     return out
 
 
+def _validate_consolidate_sheets(data):
+    """Validate a consolidate sheets action."""
+    out = {
+        "action": "consolidate_sheets",
+        "summary": str(data.get("summary", "Consolidar hojas")),
+    }
+
+    # Validate source_sheets (optional, can be null to use all sheets)
+    source_sheets = data.get("source_sheets")
+    if source_sheets is not None:
+        if not isinstance(source_sheets, list):
+            raise ValueError("source_sheets debe ser una lista")
+        out["source_sheets"] = [str(s).strip() for s in source_sheets if s]
+
+    # Validate dest_sheet_name (optional)
+    dest_sheet_name = str(data.get("dest_sheet_name", "Consolidado")).strip()
+    if dest_sheet_name:
+        if len(dest_sheet_name) > 31 or any(ch in dest_sheet_name for ch in (":", "\\", "/", "?", "*", "[", "]")):
+            raise ValueError(_("actions.error.invalid_sheet_name", dest_sheet_name))
+    out["dest_sheet_name"] = dest_sheet_name or "Consolidado"
+
+    # Validate has_headers (optional, default True)
+    out["has_headers"] = bool(data.get("has_headers", True))
+
+    return out
+
+
+def _validate_create_chart(data):
+    """Validate a create chart action."""
+    out = {
+        "action": "create_chart",
+        "summary": str(data.get("summary", "Crear gráfico")),
+    }
+
+    # Validate source_range (required)
+    source_range = str(data.get("source_range", "")).strip()
+    if not source_range:
+        raise ValueError("source_range es requerido para crear gráfico")
+    if not re.match(r'^[A-Z]+\d+:[A-Z]+\d+$', source_range, re.I):
+        raise ValueError("source_range debe ser un rango válido (ej: A1:B10)")
+    out["source_range"] = source_range
+
+    # Validate chart_type (optional, default bar)
+    chart_type = str(data.get("chart_type", "bar")).lower()
+    valid_types = {"bar", "line", "pie", "area", "scatter"}
+    if chart_type not in valid_types:
+        raise ValueError(f"Tipo de gráfico '{chart_type}' no válido. Use: {', '.join(valid_types)}")
+    out["chart_type"] = chart_type
+
+    # Validate title (optional)
+    title = str(data.get("title", "")).strip()
+    out["title"] = title
+
+    # Validate dest_cell (optional, default A1)
+    dest_cell = str(data.get("dest_cell", "A1")).strip().upper()
+    if dest_cell and not re.match(r'^[A-Z]+\d+$', dest_cell):
+        raise ValueError("dest_cell debe ser una celda válida (ej: D1)")
+    out["dest_cell"] = dest_cell or "A1"
+
+    # Validate dest_sheet_name (optional)
+    dest_sheet_name = data.get("dest_sheet_name")
+    if dest_sheet_name:
+        dest_sheet_name = str(dest_sheet_name).strip()
+        if len(dest_sheet_name) > 31 or any(ch in dest_sheet_name for ch in (":", "\\", "/", "?", "*", "[", "]")):
+            raise ValueError(_("actions.error.invalid_sheet_name", dest_sheet_name))
+        out["dest_sheet_name"] = dest_sheet_name
+    else:
+        out["dest_sheet_name"] = None
+
+    return out
+
+
+def _validate_conditional_format(data):
+    """Validate a conditional format action."""
+    out = {
+        "action": "apply_conditional_format",
+        "summary": str(data.get("summary", "Aplicar formato condicional")),
+    }
+
+    # Validate cell_range (required)
+    cell_range = str(data.get("cell_range", "")).strip()
+    if not cell_range:
+        raise ValueError("cell_range es requerido para formato condicional")
+    if not re.match(r'^[A-Z]+\d+(:[A-Z]+\d+)?$', cell_range, re.I):
+        raise ValueError("cell_range debe ser un rango válido (ej: A1:A10)")
+    out["cell_range"] = cell_range
+
+    # Validate condition (optional, default greater)
+    out["condition"] = str(data.get("condition", "greater")).lower()
+
+    # Validate value (optional)
+    out["value"] = data.get("value")
+
+    # Validate style_type (optional)
+    out["style_type"] = str(data.get("style_type", "color")).lower()
+
+    # Validate style_value (optional)
+    out["style_value"] = data.get("style_value")
+
+    return out
+
+
+def _validate_data_validation(data):
+    """Validate a data validation action."""
+    out = {
+        "action": "apply_data_validation",
+        "summary": str(data.get("summary", "Aplicar validación de datos")),
+    }
+
+    # Validate cell_range (required)
+    cell_range = str(data.get("cell_range", "")).strip()
+    if not cell_range:
+        raise ValueError("cell_range es requerido para validación")
+    if not re.match(r'^[A-Z]+\d+(:[A-Z]+\d+)?$', cell_range, re.I):
+        raise ValueError("cell_range debe ser un rango válido (ej: A1:A10)")
+    out["cell_range"] = cell_range
+
+    # Validate validation_type (optional, default list)
+    validation_type = str(data.get("validation_type", "list")).lower()
+    valid_types = {"list", "number", "date", "time", "textlength"}
+    if validation_type not in valid_types:
+        raise ValueError(f"Tipo de validación '{validation_type}' no válido. Use: {', '.join(valid_types)}")
+    out["validation_type"] = validation_type
+
+    # Validate formula1 (optional)
+    out["formula1"] = data.get("formula1")
+
+    # Validate formula2 (optional)
+    out["formula2"] = data.get("formula2")
+
+    # Validate input message settings
+    out["show_input_message"] = bool(data.get("show_input_message", True))
+    out["input_title"] = str(data.get("input_title", "")).strip()
+    out["input_message"] = str(data.get("input_message", "")).strip()
+
+    # Validate error settings
+    out["show_error"] = bool(data.get("show_error", True))
+    out["error_title"] = str(data.get("error_title", "Error")).strip()
+    out["error_message"] = str(data.get("error_message", "Valor inválido")).strip()
+    error_style = str(data.get("error_style", "stop")).lower()
+    if error_style not in {"stop", "warning", "information"}:
+        error_style = "stop"
+    out["error_style"] = error_style
+
+    return out
+
+
 def extract_json(text):
     if not text:
         raise ValueError(_("actions.error.empty_response"))
@@ -226,6 +373,22 @@ def validate_calc_preview(data, allowed_cells=None):
     action = str(data.get("action", "")).strip()
     if action == "create_pivot_table":
         return _validate_pivot_table(data)
+
+    # Handle consolidate sheets action
+    if action == "consolidate_sheets":
+        return _validate_consolidate_sheets(data)
+
+    # Handle create chart action
+    if action == "create_chart":
+        return _validate_create_chart(data)
+
+    # Handle conditional format action
+    if action == "apply_conditional_format":
+        return _validate_conditional_format(data)
+
+    # Handle data validation action
+    if action == "apply_data_validation":
+        return _validate_data_validation(data)
 
     changes = data.get("changes")
     if not isinstance(changes, list) or not changes:

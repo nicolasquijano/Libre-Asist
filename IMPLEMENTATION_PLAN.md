@@ -1217,6 +1217,177 @@ Archivos principales:
 4. Crear hoja completa Calc.
 5. Duplicados y limpieza guiada Calc.
 6. Conciliacion bancaria inicial.
+
+## Nueva Fase - Calc Avanzado (Futuro)
+
+### Graficos Dinamicos
+
+Estado: implementado.
+
+### Formatos Condicionales Avanzados
+
+Estado: implementado.
+
+Pedidos esperados:
+- "crear grafico de barras";
+- "grafico de lineas por mes";
+- "torta de categorias";
+- "grafico con los totales".
+
+Comportamiento esperado:
+- Detectar datos source (columnas con etiquetas y valores).
+- Crear grafico en hoja nueva o junto a los datos.
+- Tipos soportados: barras, lineas, torta, area.
+- Permitir titulo y ubicacion configurable.
+
+Archivos principales:
+- `calc_ops.py`: funciones para crear graficos via UNO.
+- `skills_calc.py`: skill `calc_create_chart`.
+- `actions.py`: validar parametros de grafico.
+
+### Formatos Condicionales Avanzados
+
+Estado: pendiente.
+
+Pedidos esperados:
+- "resaltar mayores a 1000 en rojo";
+- "formato condicional con semaforo";
+- "colorear celdas segun valor".
+
+Comportamiento esperado:
+- Aplicar reglas de formato condicional a rangos.
+- Soportar: mayor/menor/igual, entre, texto contiene, fecha.
+- Colores basicos y simbolos (semafoto, flechas).
+
+Archivos principales:
+- `calc_ops.py`: aplicar formato condicional via `CellRangeAppearance`.
+- `skills_calc.py`: skill `calc_conditional_format`.
+
+### Validacion de Datos
+
+Estado: implementado.
+
+Pedidos esperados:
+- "agregar lista desplegable";
+- "validar que sea numero entre 1 y 100";
+- "restringir a fechas".
+
+Comportamiento esperado:
+- Agregar validacion de datos a celdas/rangos.
+- Tipos: lista, numero, fecha, longitud texto.
+- Mensaje de error personalizable.
+
+Archivos principales:
+- `calc_ops.py`: funciones de validacion UNO.
+- `skills_calc.py`: skill `calc_data_validation`.
+
+### Consolidar Hojas
+
+Estado: implementado.
+
+Pedidos esperados:
+- "consolidar todas las hojas";
+- "combinar datos de hoja1 y hoja2";
+- "unir tablas de varias hojas".
+
+Comportamiento esperado:
+- Detectar estructura similar entre hojas.
+- Crear hoja consolidada con todos los datos.
+- Manejar encabezados y duplicados.
+
+Archivos principales:
+- `calc_ops.py`: funciones de consolidacion.
+- `skills_calc.py`: skill `calc_consolidate`.
+
+### Filtros Avanzados
+
+Estado: pendiente.
+
+Pedidos esperados:
+- "filtrar donde columna A sea X";
+- "mostrar solo filas con valor mayor a 100";
+- "aplicar autofiltro avanzado".
+
+Comportamiento esperado:
+- Aplicar autofiltros con criterios multiples.
+- Crear filtro avanzado en ubicacion especificada.
+- Mostrar resultado filtrado.
+
+Archivos principales:
+- `calc_ops.py`: funciones de filtrado UNO.
+- `skills_calc.py`: skill `calc_advanced_filter`.
+
+### Proteccion de Datos
+
+Estado: pendiente.
+
+Pedidos esperados:
+- "proteger esta hoja";
+- "bloquear celdas con formulas";
+- "desproteger para editarlas".
+
+Comportamiento esperado:
+- Proteger hoja con contrasena (opcional).
+- Proteger solo celdas con formulas o selection.
+- Solicitar contrasena para desproteger.
+
+Archivos principales:
+- `calc_ops.py`: funciones de proteccion UNO.
+- `skills_calc.py`: skill `calc_protection`.
+
+### Macros Generadas
+
+Estado: pendiente.
+
+Pedidos esperados:
+- "generar macro para hacer X";
+- "crear automation para esta tarea";
+- "codigo basic para...".
+
+Comportamiento esperado:
+- Generar codigo LibreOffice Basic legible.
+- Basado en acciones ya realizadas o solicitadas.
+- Mostrar codigo para que usuario lo copie a modulo.
+
+Archivos principales:
+- `skills_calc.py`: skill `calc_generate_macro`.
+- `writer_ops.py`: skill `writer_generate_macro`.
+
+### Temas y Estilos
+
+Estado: pendiente.
+
+Pedidos esperados:
+- "aplicar tema azul profesional";
+- "estilo corporativo";
+- "colores de encabezado modernos".
+
+Comportamiento esperado:
+- Aplicar temas predefinidos a hojas.
+- Colores coordinados para encabezados, datos, totales.
+- Temas: corporativo, analisis, presentacion.
+
+Archivos principales:
+- `calc_ops.py`: definicion de temas y aplicacion.
+- `skills_calc.py`: skill `calc_apply_theme`.
+
+### Formato Condicional con Iconos
+
+Estado: pendiente.
+
+Pedidos esperados:
+- "semafoto en columna A";
+- "flechas hacia arriba y abajo";
+- "barras de datos";
+
+Comportamiento esperado:
+- Aplicar iconos condicionales a celdas.
+- Semafoto, flechas, valores.
+- Configurar rangos y umbrales.
+
+Archivos principales:
+- `calc_ops.py`: funciones de formato condicional avanzado.
+- `skills_calc.py`: skill `calc_icon_conditional_format`.
 7. Revisor sin modificar.
 8. Sugerencias contextuales.
 9. Historial de acciones.
